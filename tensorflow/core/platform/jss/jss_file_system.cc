@@ -1084,7 +1084,7 @@ namespace tensorflow {
     TF_RETURN_IF_ERROR(get_time_str(&date_str));
     TF_RETURN_IF_ERROR(request->AddHeader("Date", date_str));
     string copy_header = strings::StrCat("/", src_bucket, "/", request->EscapeString(src_object));
-    TF_RETURN_IF_ERROR(request->AddHeader("x-jss-copy-source", date_str));
+    TF_RETURN_IF_ERROR(request->AddHeader("x-jss-copy-source", copy_header));
     customHead = strings::StrCat("x-jss-copy-source:", copy_header);
     resource = strings::StrCat("/", target_bucket, "/", target_object);
     TF_RETURN_IF_ERROR(JssAuthProvider::GetToken(auth_provider_.get(), request.get(), &auth_token,
