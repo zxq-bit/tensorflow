@@ -319,11 +319,11 @@ namespace tensorflow {
         TF_RETURN_IF_ERROR(request->Init());
         TF_RETURN_IF_ERROR(
             request->SetUri(strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", bucket_,
-                                            "/", request->EscapeString(object_))));
+                                            "/", object_)));
 
         TF_RETURN_IF_ERROR(get_time_str(&date_str));
         TF_RETURN_IF_ERROR(request->AddHeader("Date", date_str));
-        resource = strings::StrCat("/", bucket_, "/", request->EscapeString(object_));
+        resource = strings::StrCat("/", bucket_, "/", object_);
         TF_RETURN_IF_ERROR(JssAuthProvider::GetToken(auth_provider_, request.get(), &auth_token,
                                                      &method, &date_str, &content_type, &customHead,
                                                      &resource));
@@ -360,11 +360,11 @@ namespace tensorflow {
         TF_RETURN_IF_ERROR(request->Init());
         TF_RETURN_IF_ERROR(
             request->SetUri(strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", bucket_,
-                                            "/", request->EscapeString(object_))));
+                                            "/", object_)));
 
         TF_RETURN_IF_ERROR(get_time_str(&date_str));
         TF_RETURN_IF_ERROR(request->AddHeader("Date", date_str));
-        resource = strings::StrCat("/", bucket_, "/", request->EscapeString(object_));
+        resource = strings::StrCat("/", bucket_, "/", object_);
         TF_RETURN_IF_ERROR(JssAuthProvider::GetToken(auth_provider_, request.get(), &auth_token,
                                                      &method, &date_str, &content_type, &customHead,
                                                      &resource));
@@ -529,11 +529,11 @@ namespace tensorflow {
         TF_RETURN_IF_ERROR(request->Init());
         TF_RETURN_IF_ERROR(
             request->SetUri(strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", bucket_,
-                                            "/", request->EscapeString(object_))));
+                                            "/", object_)));
 
         TF_RETURN_IF_ERROR(get_time_str(&date_str));
         TF_RETURN_IF_ERROR(request->AddHeader("Date", date_str));
-        resource = strings::StrCat("/", bucket_, "/", request->EscapeString(object_));
+        resource = strings::StrCat("/", bucket_, "/", object_);
         TF_RETURN_IF_ERROR(JssAuthProvider::GetToken(auth_provider_, request.get(), &auth_token,
                                                      &method, &date_str, &content_type, &customHead,
                                                      &resource));
@@ -733,11 +733,11 @@ namespace tensorflow {
     TF_RETURN_IF_ERROR(request->Init());
     TF_RETURN_IF_ERROR(
         request->SetUri(strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", bucket,
-                                        "/", request->EscapeString(object))));
+                                        "/", object)));
 
     TF_RETURN_IF_ERROR(get_time_str(&date_str));
     TF_RETURN_IF_ERROR(request->AddHeader("Date", date_str));
-    resource = strings::StrCat("/", bucket, "/", request->EscapeString(object));
+    resource = strings::StrCat("/", bucket, "/", object);
     TF_RETURN_IF_ERROR(JssAuthProvider::GetToken(auth_provider_.get(), request.get(), &auth_token,
                                                  &method, &date_str, &content_type, &customHead, &resource));
     TF_RETURN_IF_ERROR(request->AddHeader("Authorization", auth_token));
@@ -881,7 +881,7 @@ namespace tensorflow {
     if (!include_self_directory_marker) {
       object_prefix.append("/");
     }
-    url_full = strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", request->EscapeString(bucket),
+    url_full = strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", bucket,
                                "?prefix=", request->EscapeString(object_prefix),
                                "&maxKeys=", max_results);
     if (!recursive) {
@@ -965,11 +965,11 @@ namespace tensorflow {
     TF_RETURN_IF_ERROR(request->Init());
     TF_RETURN_IF_ERROR(
         request->SetUri(strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", bucket,
-                                        "/", request->EscapeString(object))));
+                                        "/", object)));
     TF_RETURN_IF_ERROR(get_time_str(&date_str));
     TF_RETURN_IF_ERROR(request->AddHeader("Date", date_str));
 
-    resource = strings::StrCat("/", bucket, "/", request->EscapeString(object));
+    resource = strings::StrCat("/", bucket, "/", object);
     TF_RETURN_IF_ERROR(JssAuthProvider::GetToken(auth_provider_.get(), request.get(), &auth_token,
                                                  &method, &date_str, &content_type, &customHead, &resource));
     TF_RETURN_IF_ERROR(request->AddHeader("Authorization", auth_token));
@@ -1067,14 +1067,14 @@ namespace tensorflow {
     TF_RETURN_IF_ERROR(request->Init());
     TF_RETURN_IF_ERROR(
         request->SetUri(strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", target_bucket,
-                                        "/", request->EscapeString(target_object))));
+                                        "/", target_object)));
 
     TF_RETURN_IF_ERROR(get_time_str(&date_str));
     TF_RETURN_IF_ERROR(request->AddHeader("Date", date_str));
-    string copy_header = strings::StrCat("/", target_bucket, "/", request->EscapeString(target_object));
+    string copy_header = strings::StrCat("/", src_bucket, "/", request->EscapeString(src_object));
     TF_RETURN_IF_ERROR(request->AddHeader("x-jss-copy-source", date_str));
     customHead = strings::StrCat("x-jss-copy-source:", copy_header);
-    resource = strings::StrCat("/", target_bucket, "/", request->EscapeString(target_object));
+    resource = strings::StrCat("/", target_bucket, "/", target_object);
     TF_RETURN_IF_ERROR(JssAuthProvider::GetToken(auth_provider_.get(), request.get(), &auth_token,
                                                  &method, &date_str, &content_type, &customHead, &resource));
     TF_RETURN_IF_ERROR(request->AddHeader("Authorization", auth_token));
