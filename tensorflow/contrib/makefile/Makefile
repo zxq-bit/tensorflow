@@ -466,6 +466,7 @@ $(wildcard tensorflow/core/platform/default/stream_executor.*) \
 $(wildcard tensorflow/core/platform/default/test_benchmark.*) \
 $(wildcard tensorflow/core/platform/cuda.h) \
 $(wildcard tensorflow/core/platform/cloud/*) \
+$(wildcard tensorflow/core/platform/jss/*) \
 $(wildcard tensorflow/core/platform/google/*) \
 $(wildcard tensorflow/core/platform/google/*/*) \
 $(wildcard tensorflow/core/platform/jpeg.*) \

@@ -50,7 +50,7 @@ cc_library(
     name = "http_request",
     srcs = ["http_request.cc"],
     hdrs = ["http_request.h"],
-    visibility = ["//tensorflow:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         "//tensorflow/core:framework_headers_lib",
         "//tensorflow/core:lib_internal",
@@ -118,6 +118,7 @@ cc_library(
     hdrs = [
         "retrying_file_system.h",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//tensorflow/core:framework_headers_lib",
         "//tensorflow/core:lib_internal",
@@ -132,6 +133,7 @@ cc_library(
     hdrs = [
         "time_util.h",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//tensorflow/core:framework_headers_lib",
         "//tensorflow/core:lib_internal",

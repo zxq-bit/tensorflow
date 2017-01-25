@@ -77,6 +77,7 @@ fi
 
 if is_windows; then
   TF_NEED_GCP=0
+  TF_NEED_JSS=0
   TF_NEED_HDFS=0
   TF_NEED_JEMALLOC=0
   TF_NEED_OPENCL=0
@@ -105,14 +106,14 @@ fi
 
 while [ "$TF_NEED_GCP" == "" ]; do
   read -p "Do you wish to build TensorFlow with "\
-"Google Cloud Platform support? [y/N] " INPUT
+"Google Cloud Platform support? [Y/n] " INPUT
   case $INPUT in
     [Yy]* ) echo "Google Cloud Platform support will be enabled for "\
 "TensorFlow"; TF_NEED_GCP=1;;
     [Nn]* ) echo "No Google Cloud Platform support will be enabled for "\
 "TensorFlow"; TF_NEED_GCP=0;;
-    "" ) echo "No Google Cloud Platform support will be enabled for "\
-"TensorFlow"; TF_NEED_GCP=0;;
+    "" ) echo "Google Cloud Platform support will be enabled for "\
+"TensorFlow"; TF_NEED_GCP=1;;
     * ) echo "Invalid selection: " $INPUT;;
   esac
 done
@@ -132,6 +133,29 @@ else
   # Update Bazel build configuration.
   sed -i -e "s/WITH_GCP_SUPPORT = True/WITH_GCP_SUPPORT = False/" tensorflow/core/platform/default/build_config.bzl
 fi
+
+while [ "$TF_NEED_JSS" == "" ] && [ "$TF_NEED_GCP" == "1" ]; do
+  read -p "Do you wish to build TensorFlow with "\
+"JSS support? [Y/n] " INPUT
+  case $INPUT in
+    [Yy]* ) echo "JSS support will be enabled for "\
+"TensorFlow"; TF_NEED_JSS=1;;
+    [Nn]* ) echo "No JSS support will be enabled for "\
+"TensorFlow"; TF_NEED_JSS=0;;
+    "" ) echo "JSS support will be enabled for "\
+"TensorFlow"; TF_NEED_JSS=1;;
+    * ) echo "Invalid selection: " $INPUT;;
+  esac
+done
+
+if [ "$TF_NEED_JSS" == "1" ]; then
+  # Update Bazel build configuration.
+  sed -i -e "s/WITH_JSS_SUPPORT = False/WITH_JSS_SUPPORT = True/" tensorflow/core/platform/default/build_config.bzl
+else
+  # Update Bazel build configuration.
+  sed -i -e "s/WITH_JSS_SUPPORT = True/WITH_JSS_SUPPORT = False/" tensorflow/core/platform/default/build_config.bzl
+fi
+
 
 while [ "$TF_NEED_HDFS" == "" ]; do
   read -p "Do you wish to build TensorFlow with "\

@@ -5,8 +5,9 @@ load("@protobuf//:protobuf.bzl", "py_proto_library")
 load("//tensorflow:tensorflow.bzl", "if_not_mobile")
 
 # configure may change the following lines
-WITH_GCP_SUPPORT = False
-WITH_HDFS_SUPPORT = False
+WITH_GCP_SUPPORT = True
+WITH_JSS_SUPPORT = True
+WITH_HDFS_SUPPORT = True
 WITH_XLA_SUPPORT = False
 WITH_JEMALLOC = True
 
@@ -221,6 +222,8 @@ def tf_additional_core_deps():
   deps = []
   if WITH_GCP_SUPPORT:
     deps.append("//tensorflow/core/platform/cloud:gcs_file_system")
+  if WITH_JSS_SUPPORT:
+    deps.append("//tensorflow/core/platform/jss:jss_file_system")
   if WITH_HDFS_SUPPORT:
     deps.append("//tensorflow/core/platform/hadoop:hadoop_file_system")
   return deps

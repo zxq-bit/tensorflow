@@ -181,6 +181,7 @@ filegroup(
         "//tensorflow/core/kernels/hexagon:all_files",
         "//tensorflow/core/ops/compat:all_files",
         "//tensorflow/core/platform/cloud:all_files",
+        "//tensorflow/core/platform/jss:all_files",
         "//tensorflow/core/platform/default/build_config:all_files",
         "//tensorflow/core/platform/hadoop:all_files",
         "//tensorflow/core/util/ctc:all_files",
