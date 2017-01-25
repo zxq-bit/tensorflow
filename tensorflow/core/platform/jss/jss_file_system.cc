@@ -797,7 +797,7 @@ namespace tensorflow {
         if (bucket_json == Json::Value::null) continue;
         string bucket_name;
         TF_RETURN_IF_ERROR(GetStringValue(bucket_json, "Name", &bucket_name));
-        if (bucket_name.compare(bucket) == 0) {
+        if (bucket.compare(bucket_name) == 0) {
           *result = true;
           return Status::OK();
         }
@@ -859,6 +859,7 @@ namespace tensorflow {
                                            std::vector<string> *result,
                                            bool recursive,
                                            bool include_self_directory_marker) {
+    if (max_results >= 2147483647L) max_results = 2147483647L;
     if (!result) {
       return errors::InvalidArgument("'result' cannot be null");
     }
@@ -878,12 +879,14 @@ namespace tensorflow {
     TF_RETURN_IF_ERROR(request->Init());
 
     string url_full;
-    if (!include_self_directory_marker) {
+    if (!include_self_directory_marker && object_prefix.back() != '/') {
       object_prefix.append("/");
     }
     url_full = strings::StrCat("http://", auth_provider_->GetEndPoint(), "/", bucket,
-                               "?prefix=", request->EscapeString(object_prefix),
-                               "&maxKeys=", max_results);
+                               "?maxKeys=", max_results);
+    if (object_prefix.size() > 0 && object_prefix.compare("/") != 0) {
+      url_full.append("&prefix=").append(request->EscapeString(object_prefix));
+    }
     if (!recursive) {
       url_full.append("&delimiter=%2F");
     }
@@ -903,13 +906,22 @@ namespace tensorflow {
         StringPiece(output_buffer.data(), output_buffer.size());
     Json::Value root;
     TF_RETURN_IF_ERROR(ParseJson(response_piece, &root));
+    Json::Value common_prefixes = root.get("CommonPrefixes", Json::Value::null);
+    if (common_prefixes != Json::Value::null) {
+      for (int i = 0; i < common_prefixes.size(); i++) {
+        Json::Value dir_key = common_prefixes.get(i, Json::Value::null);
+        if (dir_key != Json::Value::null && dir_key.isString()) {
+          result->emplace_back(strings::StrCat("jss://", bucket, "/", dir_key.asString()));
+        }
+      }
+    }
     Json::Value contents = root.get("Contents", Json::Value::null);
     if (contents != Json::Value::null) {
       for (int i = 0; i < contents.size(); i++) {
         Json::Value object_info = contents.get(i, Json::Value::null);
         if (object_info == Json::Value::null) continue;
         string object_key;
-        TF_RETURN_IF_ERROR(GetStringValue(&object_info, "Key", &object_key));
+        TF_RETURN_IF_ERROR(GetStringValue(object_info, "Key", &object_key));
         if (include_self_directory_marker || object_prefix.compare(object_key) != 0) {
           result->emplace_back(strings::StrCat("jss://", bucket, "/", object_key));
         }
