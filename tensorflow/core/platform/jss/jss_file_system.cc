@@ -250,7 +250,15 @@ namespace tensorflow {
             object_(object),
             auth_provider_(auth_provider),
             http_request_factory_(http_request_factory),
-            read_ahead_bytes_(read_ahead_bytes) {}
+            read_ahead_bytes_(read_ahead_bytes) {
+        for (int i = 0; i < 3; i++) {
+          FileStatistics stat;
+          if (StatForObject(&stat).ok()) {
+            file_size_ = size_t(stat.length);
+            break;
+          }
+        }
+      }
 
       /// The implementation of reads with a read-ahead buffer. Thread-safe.
       Status Read(uint64 offset, size_t n, StringPiece *result,
@@ -274,14 +282,7 @@ namespace tensorflow {
           if (n > buffer_.capacity() ||
               desired_buffer_size > 2 * buffer_.capacity()) {
             // Re-allocate only if buffer capacity increased significantly.
-            if (offset == 0 && buffer_.capacity() == 0) {
-              FileStatistics stat;
-              TF_RETURN_IF_ERROR(StatForObject(&stat));
-              if (desired_buffer_size > stat.length)
-                buffer_.reserve(size_t(stat.length));
-            } else {
-              buffer_.reserve(desired_buffer_size);
-            }
+            buffer_.reserve(desired_buffer_size);
           }
 
           buffer_start_offset_ = offset;
@@ -370,8 +371,10 @@ namespace tensorflow {
                                                      &resource));
         TF_RETURN_IF_ERROR(request->AddHeader("Authorization", auth_token));
 
+        size_t tail_pos = buffer_start_offset_ + buffer_.capacity();
+        if (file_size_ > 0 && tail_pos > file_size_) tail_pos = file_size_;
         TF_RETURN_IF_ERROR(request->SetRange(
-            buffer_start_offset_, buffer_start_offset_ + buffer_.capacity() - 1));
+            buffer_start_offset_, tail_pos - 1));
         TF_RETURN_IF_ERROR(request->SetResultBuffer(&buffer_));
         TF_RETURN_WITH_CONTEXT_IF_ERROR(request->Send(), " when reading jss://",
                                         bucket_, "/", object_);
@@ -383,6 +386,7 @@ namespace tensorflow {
       JssAuthProvider *auth_provider_;
       HttpRequest::Factory *http_request_factory_;
       const size_t read_ahead_bytes_;
+      size_t file_size_;
 
       // The buffer-related members need to be mutable, because they are modified
       // by the const Read() method.
