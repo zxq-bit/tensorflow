@@ -915,7 +915,11 @@ namespace tensorflow {
       for (int i = 0; i < common_prefixes.size(); i++) {
         Json::Value dir_key = common_prefixes.get(i, Json::Value::null);
         if (dir_key != Json::Value::null && dir_key.isString()) {
-          result->emplace_back(strings::StrCat("jss://", bucket, "/", dir_key.asString()));
+          string dir_key_str = dir_key.asString();
+          size_t start_pos = object_prefix.size();
+          if (object_prefix.back() == '/' && dir_key_str[start_pos] != '/') start_pos--;
+          if (dir_key_str[start_pos] == '/') start_pos++;
+          result->emplace_back(strings::StrCat(dir_key_str.substr(start_pos, dir_key_str.size() - start_pos)));
         }
       }
     }
@@ -927,7 +931,10 @@ namespace tensorflow {
         string object_key;
         TF_RETURN_IF_ERROR(GetStringValue(object_info, "Key", &object_key));
         if (include_self_directory_marker || object_prefix.compare(object_key) != 0) {
-          result->emplace_back(strings::StrCat("jss://", bucket, "/", object_key));
+          size_t start_pos = object_prefix.size();
+          if (object_prefix.back() == '/' && object_key[start_pos] != '/') start_pos--;
+          if (object_key[start_pos] == '/') start_pos++;
+          result->emplace_back(strings::StrCat(object_key.substr(start_pos, object_key.size() - start_pos)));
         }
       }
     }
